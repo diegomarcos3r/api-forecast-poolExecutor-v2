@@ -7,6 +7,8 @@ from typing import List, Dict
 class Forecast:
 
     def __init__(self, nr_simulations: int, backlog_min: int, backlog_max:int, capacity:int, throughput: List[int], pool_executor=None):
+        if pool_executor is None:
+            raise ValueError("pool_executor é obrigatório para usar ProcessPoolExecutor")
         self.nr_simulations = nr_simulations
         self.backlog_min = backlog_min
         self.backlog_max = backlog_max
@@ -30,10 +32,10 @@ class Forecast:
         )
         return response
     
-    def get_capacity_throughput(self) -> List:
+    def get_capacity_throughput(self) -> List[int]:
         throughput = self.throughput
         if self.capacity == 100:
-            return throughput
+            return list(throughput)
         
         capacity_percentage = self.capacity / 100 
 
@@ -69,9 +71,9 @@ class Forecast:
         backlog = np.random.randint(backlog_min, backlog_max + 1)
 
         while backlog_done < backlog:
-                random_throughput = np.random.choice(throughput_forecast)
-                backlog_done = random_throughput + backlog_done
-                forecast_backlog = forecast_backlog + 1
+            random_throughput = int(np.random.choice(throughput_forecast))
+            backlog_done += random_throughput
+            forecast_backlog += 1
         
         return forecast_backlog
 
